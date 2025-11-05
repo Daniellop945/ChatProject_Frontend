@@ -1,5 +1,5 @@
-import React from "react";
 import Menubar from "./Components/menuBar";
+
 
 export function MainView(){
     return(
@@ -10,7 +10,9 @@ export function MainView(){
             </main>
             <footer className="bg-white">
                 <h1>
-                    Info contact
+                    <script>
+                        getUsers
+                    </script>
                 </h1>
             </footer>
         </div>
