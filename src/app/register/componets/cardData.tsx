@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, FormEvent } from 'react';
+import React, { useState, ChangeEvent, FormEvent, useRef } from 'react';
 import { getCountries, getCountryCallingCode } from "libphonenumber-js";
 import Link from 'next/link';
 
@@ -43,9 +43,59 @@ export function Card() {
     };
 
     const [dataForm, setDataForm] = useState<FormData>(initialState)
+    
+    const nameRef = useRef<HTMLInputElement>(null)
+    const ageRef = useRef<HTMLInputElement>(null)
+    const divRef = useRef<HTMLInputElement>(null)
+    const divRef1 = useRef<HTMLInputElement>(null)
+    const divRef2 = useRef<HTMLInputElement>(null)
+    
+    const nameRegex = new RegExp("^[A-Za-z]+([\\s][A-Za-z]+)*$")
+    const emailRegex = new RegExp("")
 
     const handleChange = (e : ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const {name, value} = e.target
+
+        const inputName = nameRef.current
+        const inputAge = ageRef.current
+        const divName = divRef.current
+        const divName1 = divRef1.current
+        const divAge = divRef2.current
+
+        if(name === 'name'){
+            if(value.length < 4){
+                divName?.classList.remove('hidden')
+                inputName?.classList.add('border-red-400')
+                inputName?.classList.remove('border-violet-400')
+            }
+            else{
+                divName?.classList.add('hidden')
+                inputName?.classList.remove('border-red-400')
+                inputName?.classList.add('border-violet-400')
+            }
+            if(nameRegex.test(value.replace(/\s+/g, " ").trim())){
+                divName1?.classList.add('hidden')
+            }
+            else{
+                divName1?.classList.remove('hidden')
+                inputName?.classList.add('border-red-400')
+                inputName?.classList.remove('border-violet-400')
+            }
+        }
+
+        if(name === 'age'){
+            if(parseInt(value, 10) < 12){
+                divAge?.classList.remove('hidden')
+                inputAge?.classList.remove('border-violet-400')
+                inputAge?.classList.add('border-red-400')
+            }
+            else{
+                divAge?.classList.add('hidden')
+                inputAge?.classList.remove('border-red-400')
+                inputAge?.classList.add('border-violet-400')
+            }
+        }
+        
         setDataForm({
             ...dataForm,
             [name]: value
@@ -54,7 +104,6 @@ export function Card() {
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault()
-        alert(`Datos a enviar: Nombre - ${dataForm.name}. Email: ${dataForm.email}. Teléfono: ${dataForm.code} ${dataForm.cellphone}. Username: ${dataForm.usename}. Password: ${dataForm.password}`)
         setDataForm(initialState)
     }
 
@@ -71,25 +120,43 @@ export function Card() {
                                 <th scope='row'>Name</th>
                                 <th scope='row'>
                                     <input 
+                                        ref={nameRef}
                                         id='name' 
                                         name='name'
                                         value={dataForm.name} 
                                         onChange={handleChange} 
-                                        className="ml-3 mb-1 pl-2 p-1 pr-2 bg-white rounded-2xl border-violet-400 border-2 focus:outline-violet-800" 
+                                        className="ml-3 mb-1 pl-2 p-1 pr-2 bg-white rounded-2xl border-violet-400 border-2 focus:ring-0 focus:outline-none" 
                                     />
+                                    <div className='text-red-400 hidden' ref={divRef}>
+                                        <label className='text-xs'>
+                                            Minimum name length 4 characters
+                                        </label>
+                                    </div>
+                                    <div className='text-red-400 hidden' ref={divRef1}>
+                                        <label className='text-xs'>
+                                            The name must only contain letters
+                                        </label>
+                                    </div>
                                 </th>
                             </tr>
                             <tr>
                                 <th scope='row'>Age</th>
                                 <th scope='row'>
                                     <input 
+                                        ref={ageRef}
                                         id='age' 
                                         name='age' 
                                         type='number' 
                                         value={dataForm.age} 
                                         onChange={handleChange} 
-                                        className="ml-3 mb-1 pl-2 p-1 pr-2 bg-white rounded-2xl border-violet-400 border-2 focus:outline-violet-800" 
+                                        placeholder='12-80 years old'
+                                        className="ml-3 mb-1 pl-2 p-1 pr-2 bg-white rounded-2xl border-violet-400 border-2 focus:ring-0 focus:outline-none" 
                                     />
+                                    <div className='text-red-400' ref={divRef2}>
+                                        <label className='text-xs'>
+                                            To register you must be 12 years of age
+                                        </label>
+                                    </div>
                                 </th>
                             </tr>
                             <tr>
