@@ -1,6 +1,9 @@
-import React, { useState, ChangeEvent, FormEvent, useRef } from 'react';
-import { getCountries, getCountryCallingCode } from "libphonenumber-js";
-import Link from 'next/link';
+import { useState, ChangeEvent, FormEvent, useRef } from 'react'
+import { getCountries, getCountryCallingCode } from "libphonenumber-js"
+import Link from 'next/link'
+import Toast from './toast'
+import Image from 'next/image'
+import bg from "@/app/Img/password/show.png"
 
 const countryOptions = getCountries().map(code => {
     try {
@@ -24,7 +27,7 @@ interface FormData {
     cellphone: string
     direction: string
     country: string 
-    usename: string
+    username: string
     password: string
 }
 
@@ -38,11 +41,13 @@ export function Card() {
         cellphone: '',
         direction: '',
         country: '',
-        usename: '',
+        username: '',
         password: ''
     };
 
     const [dataForm, setDataForm] = useState<FormData>(initialState)
+    const [isVisibleToast, setVisibleToast] = useState(false)
+    const [isVisibleToast1, setVisibleToast1] = useState(false)
     
     const nameRef = useRef<HTMLInputElement>(null)
     const ageRef = useRef<HTMLInputElement>(null)
@@ -58,8 +63,11 @@ export function Card() {
     const divRef4 = useRef<HTMLInputElement>(null)
     const divRef5 = useRef<HTMLInputElement>(null)
     const divRef6 = useRef<HTMLInputElement>(null)
+    const divRef7 = useRef<HTMLInputElement>(null)
+    const divRef8 = useRef<HTMLInputElement>(null)
+    const divRef9 = useRef<HTMLInputElement>(null)
 
-    const [country, Setcountry] = useState('')
+    const [country, Setcountry] = useState('México')
     
     const nameRegex = new RegExp("^[A-Za-z]+([\\s][A-Za-z]+)*$")
     const emailRegex = new RegExp("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$")
@@ -76,6 +84,7 @@ export function Card() {
         const inputEmail = emailRef.current
         const inputCell = cellRef.current
         const inputDir = dirRef.current
+        const inputUser = userRef.current
         const divName = divRef.current
         const divName1 = divRef1.current
         const divAge = divRef2.current
@@ -83,8 +92,11 @@ export function Card() {
         const divCell = divRef4.current
         const divCell1 = divRef5.current
         const divDir = divRef6.current
+        const divUser = divRef7.current
+        const divUser1 = divRef8.current
+        const divUser2 = divRef9.current
 
-        if(name === 'name'){
+        if(name === 'name') {
             if(value.length < 4){
                 divName?.classList.remove('hidden')
                 inputName?.classList.add('border-red-400')
@@ -105,7 +117,7 @@ export function Card() {
             }
         }
 
-        if(name === 'age'){
+        if(name === 'age') {
             if(parseInt(value, 10) < 12){
                 divAge?.classList.remove('hidden')
                 inputAge?.classList.remove('border-violet-400')
@@ -118,7 +130,7 @@ export function Card() {
             }
         }
 
-        if(name === 'email'){
+        if(name === 'email') {
             if(emailRegex.test(value) === true){
                 divEmail?.classList.add('hidden')
                 inputEmail?.classList.remove('border-red-400')
@@ -131,7 +143,7 @@ export function Card() {
             }
         }
 
-        if(name === 'cellphone'){
+        if(name === 'cellphone') {
             if(cellRegex.test(value) === true){
                 divCell?.classList.add('hidden')
                 inputCell?.classList.remove('border-red-400')
@@ -154,7 +166,7 @@ export function Card() {
             }
         }
 
-        if(name === 'direction'){
+        if(name === 'direction') {
             if(dirRegex.test(value.replaceAll(" ", "")) === true){
                 divDir?.classList.add('hidden')
                 inputDir?.classList.remove('border-red-400')
@@ -162,14 +174,47 @@ export function Card() {
             }
             else{
                 divDir?.classList.remove('hidden')
-                inputDir?.classList.add('border-red-400')
                 inputDir?.classList.remove('border-violet-400')
+                inputDir?.classList.add('border-red-400')
             }
         }
 
         if(name === 'code') {
             const countryName = new Intl.DisplayNames(['es'], {type: 'region'}).of(value) 
             Setcountry(countryName + '')
+        }
+
+        if(name === 'username') {
+            if(value.length < 3 || value.length > 15){
+                divUser?.classList.remove('hidden')
+                inputUser?.classList.remove('border-violet-400')
+                inputUser?.classList.add('border-red-400')
+            }
+            else{
+                divUser?.classList.add('hidden')
+                inputUser?.classList.remove('border-red-400')
+                inputUser?.classList.add('border-violet-400')
+            }
+            if(value.startsWith('_') === true || value.endsWith('_') === true) {
+                divUser2?.classList.remove('hidden')
+                inputUser?.classList.remove('border-violet-400')
+                inputUser?.classList.add('border-red-400')
+            }
+            else if(value.length >= 3 && value.length <= 15) {
+                divUser2?.classList.add('hidden')
+                inputUser?.classList.remove('border-red-400')
+                inputUser?.classList.add('border-violet-400')
+            }
+            if(userRegex.test(value) === true && value.length >= 3 && value.length <= 15){
+                divUser1?.classList.add('hidden')
+                inputUser?.classList.remove('border-red-400')
+                inputUser?.classList.add('border-violet-400')
+            }
+            else {
+                divUser1?.classList.remove('hidden')
+                inputUser?.classList.remove('border-violet-400')
+                inputUser?.classList.add('border-red-400')
+            }
         }
 
         setDataForm({
@@ -181,6 +226,16 @@ export function Card() {
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault()
         setDataForm(initialState)
+    }
+
+    const showToast = () => {
+        if(isVisibleToast === false) setVisibleToast(true)
+        else setVisibleToast(false)
+    }
+
+    const showToast1 = () => {
+        if(isVisibleToast1 === false) setVisibleToast1(true)
+        else setVisibleToast1(false)
     }
 
     return (
@@ -250,7 +305,7 @@ export function Card() {
                                     />
                                     <div className='text-red-400 hidden' ref={divRef3}>
                                         <label className='text-xs'>
-                                            Incorrect format, check the example.
+                                            Incorrect format, check the example
                                         </label>
                                     </div>
                                 </th>
@@ -319,7 +374,16 @@ export function Card() {
                                 </th>
                             </tr>
                             <tr>
-                                <th scope='row'>Country</th>
+                                <th scope='row'>
+                                    <label>Country</label>
+                                    <button className='rounded-full w-5 h-5 bg-blue-300 ml-2 hover:bg-blue-600 text-white' 
+                                        onClick={() => {
+                                            showToast1()
+                                        }}
+                                    >
+                                        ?
+                                    </button>
+                                </th>
                                 <th scope='row'>
                                     <input 
                                         ref={countryRef}
@@ -332,29 +396,64 @@ export function Card() {
                                     />
                                 </th>
                             </tr>
-                            <tr>
-                                <th scope='row'>Username</th>
+                            <tr className='justify-center items-center'>
+                                <th scope='row' className='justify-center items-center'>
+                                    <label>Username</label>
+                                    <button className='rounded-full w-5 h-5 bg-blue-300 ml-2 hover:bg-blue-600 text-white' 
+                                        onClick={() => {
+                                            showToast()
+                                        }}
+                                    >
+                                        ?
+                                    </button>
+                                </th>
                                 <th scope='row'>
                                     <input 
+                                        ref={userRef}
                                         id='username' 
-                                        name='usename' 
-                                        value={dataForm.usename} 
+                                        name='username' 
+                                        value={dataForm.username} 
                                         onChange={handleChange} 
+                                        placeholder='user945_gamer, X_X_X, a'
                                         className="ml-3 mb-1 pl-2 p-1 pr-2 bg-white rounded-2xl border-violet-400 border-2 focus:ring-0 focus:outline-none" 
                                     />
+                                    <div className='text-red-400 hidden' ref={divRef7}>
+                                        <label className='text-xs'>
+                                            Username of 3 to 15 characters
+                                        </label>
+                                    </div>
+                                    <div className='text-red-400 hidden' ref={divRef8}>
+                                        <label className='text-xs'>
+                                            Invalid format, check the help.
+                                        </label>
+                                    </div>
+                                    <div className='text-red-400 hidden' ref={divRef9}>
+                                        <label className='text-xs'>
+                                            Username cannot begin with _ or end with _
+                                        </label>
+                                    </div>
                                 </th>
                             </tr>
                             <tr>
                                 <th scope='row'>Password</th>
-                                <th scope='row'>
-                                    <input 
-                                        id='password' 
-                                        name='password'
-                                        type='password' 
-                                        value={dataForm.password} 
-                                        onChange={handleChange}
-                                        className="ml-3 mb-2 pl-2 p-1 pr-2 bg-white rounded-2xl border-violet-400 border-2 focus:ring-0 focus:outline-none" 
-                                    />
+                                <th scope='row' className=''>
+                                    <div className="relative w-full max-w-sm">
+                                        <input 
+                                            id='password' 
+                                            name='password'
+                                            type='password' 
+                                            value={dataForm.password} 
+                                            onChange={handleChange}
+                                            className="ml-3 mb-2 pl-2 p-1 pr-2 bg-white rounded-2xl border-violet-400 border-2 focus:ring-0 focus:outline-none" 
+                                            
+                                        />
+                                        <button type="button" className="absolute inset-y-1/2 right-0 flex justify-center items-center text-center pr-3">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-5 h-5 text-gray-400 hover:text-gray-600">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.433 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                            </svg>
+                                        </button>
+                                    </div>
                                 </th>
                             </tr>
                         </tbody>
@@ -365,6 +464,16 @@ export function Card() {
                 </form>
                 <Link className="text-violet-800" href={'/'}>Return</Link>
             </div>
+            {
+                isVisibleToast && (
+                    <Toast message={'The username cannot begin with _ or end with _\nit is also not possible to use special characters, as only _\nand alphanumeric characters are allowed.'}/>
+                )
+            }
+            {
+                isVisibleToast1 && (
+                    <Toast message={'The country has the same value as the selected code.'}/>
+                )
+            }
         </div>
     );
 }
